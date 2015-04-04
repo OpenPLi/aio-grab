@@ -716,20 +716,20 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 	int mem_fd;
 	//unsigned char *memory;
 	void *memory;
+	unsigned char *luma = NULL;
+	unsigned char *chroma = NULL;
+	unsigned char *memory_tmp = NULL;
+	int t;
+	int res = 0;
+	int stride = 0;
+	FILE *fp;
+	char buf[256];
+
 	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
 	{
 		fprintf(stderr, "Mainmemory: can't open /dev/mem \n");
 		return;
 	}
-
-	unsigned char *luma, *chroma, *memory_tmp;
-	luma = (unsigned char *)malloc(1); // real malloc will be done later
-	chroma = (unsigned char *)malloc(1); // this is just to be sure it get initialized and free() will not segfaulting
-	memory_tmp = (unsigned char *)malloc(1);
-	int t,stride,res;
-	res = stride = 0;
-	char buf[256];
-	FILE *fp;
 
 	if (stb_type > XILLEON)
 	{
@@ -851,7 +851,6 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		}
 
 		t=t2=dat1=0;
-
 		xsub=chr_luma_stride;
 		// decode luma & chroma plane or lets say sort it
 		for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
