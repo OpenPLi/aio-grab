@@ -859,14 +859,18 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 				 // luma
 				t = pageoffset;
 				xsub = chr_luma_stride;
-				for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
+				for (xtmp = 0; xtmp < stride; xtmp += chr_luma_stride)
 				{
 					if ((stride-xtmp) <= chr_luma_stride)
 						xsub = stride - xtmp;
 					dat1 = xtmp;
 					for (ytmp = 0; ytmp < ofs; ytmp++)
 					{
-						memcpy(luma + dat1, memory_tmp + t, xsub);
+						uint32_t *d = (uint32_t*)(luma + dat1);
+						uint32_t *s = (uint32_t*)(memory_tmp + t);
+						int c = xsub >> 2;
+						while (c--)
+							*d++ = __builtin_bswap32(*s++);
 						t += chr_luma_stride;
 						dat1 += stride;
 					}
@@ -877,14 +881,18 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 				// chroma
 				t = pageoffset + offset;
 				xsub = chr_luma_stride; // apparently lumastride == chromastride
-				for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
+				for (xtmp = 0; xtmp < stride; xtmp += chr_luma_stride)
 				{
 					if ((stride-xtmp) <= chr_luma_stride)
 						xsub = stride-xtmp;
 					dat1=xtmp;
 					for (ytmp = 0; ytmp < ofs2; ytmp++)
 					{
-						memcpy(chroma + dat1, memory_tmp + t, xsub);
+						uint32_t *d = (uint32_t*)(chroma + dat1);
+						uint32_t *s = (uint32_t*)(memory_tmp + t);
+						int c = xsub >> 2;
+						while (c--)
+							*d++ = __builtin_bswap32(*s++);
 						t += chr_luma_stride;
 						dat1 += stride;
 					}
@@ -892,25 +900,6 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 			}
 		}
 		munmap(memory_tmp, memory_tmp_size);
-
-		int count = (stride*ofs) >> 2;
-		#pragma omp parallel for
-		for (t = 0; t < count; ++t)
-		{
-			unsigned char* p = luma + (4 * t);
-			unsigned char t;
-			SWAP(p[0], p[3]);
-			SWAP(p[1], p[2]);
-		}
-		count = (stride*ofs2) >> 2;
-		#pragma omp parallel for 
-		for (t = 0; t < count; ++t)
-		{
-			unsigned char* p = chroma + (4 * t);
-			unsigned char t;
-			SWAP(p[0], p[3]);
-			SWAP(p[1], p[2]);
-		}
 	}
 	else if (stb_type == XILLEON)
 	{
