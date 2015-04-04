@@ -850,35 +850,45 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 			memory_tmp_size -= 0x1000;
 		}
 
-		t=t2=dat1=0;
-		xsub=chr_luma_stride;
 		// decode luma & chroma plane or lets say sort it
-		for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
+		#pragma omp parallel shared(stride, luma, chroma) private(t, dat1, xsub, xtmp, ytmp)
+		#pragma omp sections
 		{
-			if ((stride-xtmp) <= chr_luma_stride)
-				xsub=stride-xtmp;
-
-			dat1=xtmp;
-			for (ytmp = 0; ytmp < ofs; ytmp++)
+			#pragma omp section
 			{
-				memcpy(luma+dat1,memory_tmp+pageoffset+t,xsub); // luma
-				t+=chr_luma_stride;
-				dat1+=stride;
+				 // luma
+				t = pageoffset;
+				xsub = chr_luma_stride;
+				for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
+				{
+					if ((stride-xtmp) <= chr_luma_stride)
+						xsub = stride - xtmp;
+					dat1 = xtmp;
+					for (ytmp = 0; ytmp < ofs; ytmp++)
+					{
+						memcpy(luma + dat1, memory_tmp + t, xsub);
+						t += chr_luma_stride;
+						dat1 += stride;
+					}
+				}
 			}
-		}
-		// Hmm apparently lumastride == chromastride?
-		xsub=chr_luma_stride;
-		for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
-		{
-			if ((stride-xtmp) <= chr_luma_stride)
-				xsub=stride-xtmp;
-
-			dat1=xtmp;
-			for (ytmp = 0; ytmp < ofs2; ytmp++)
+			#pragma omp section
 			{
-				memcpy(chroma+dat1,memory_tmp+pageoffset+offset+t2,xsub); // chroma
-				t2+=chr_luma_stride;
-				dat1+=stride;
+				// chroma
+				t = pageoffset + offset;
+				xsub = chr_luma_stride; // apparently lumastride == chromastride
+				for (xtmp=0; xtmp < stride; xtmp += chr_luma_stride)
+				{
+					if ((stride-xtmp) <= chr_luma_stride)
+						xsub = stride-xtmp;
+					dat1=xtmp;
+					for (ytmp = 0; ytmp < ofs2; ytmp++)
+					{
+						memcpy(chroma + dat1, memory_tmp + t, xsub);
+						t += chr_luma_stride;
+						dat1 += stride;
+					}
+				}
 			}
 		}
 		munmap(memory_tmp, memory_tmp_size);
