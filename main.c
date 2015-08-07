@@ -83,7 +83,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, PALLAS, VULCAN, XILLEON, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM7241, BRCM7356, BRCM7424, BRCM7425, BRCM7435, BRCM7552} stb_type = UNKNOWN;
+static enum {UNKNOWN, PALLAS, VULCAN, XILLEON, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM7241, BRCM7346, BRCM7356, BRCM7424, BRCM7425, BRCM7435, BRCM7552, BRCM7584} stb_type = UNKNOWN;
 
 static int chr_luma_stride = 0x40;
 static int chr_luma_register_offset = 0;
@@ -217,6 +217,11 @@ int main(int argc, char **argv)
 					stb_type = BRCM7552;
 					break;
 				}
+				else if (strstr(buf,"7584"))
+				{
+					stb_type = BRCM7584;
+					break;
+				}
 			}
 			fclose(file);
 		}
@@ -294,12 +299,14 @@ int main(int argc, char **argv)
 			mem2memdma_register = 0x10c01000;
 			break;
 		case BRCM7358:
+		case BRCM7552:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x40;
 			chr_luma_register_offset = 0x34;
 			mem2memdma_register = 0;
 			break;
 		case BRCM7362:
+		case BRCM7584:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x40;
 			chr_luma_register_offset = 0x34;
@@ -310,20 +317,9 @@ int main(int argc, char **argv)
 		case BRCM7356:
 		case BRCM7424:
 		case BRCM7425:
-			registeroffset = 0x10600000;
-			chr_luma_stride = 0x80;
-			chr_luma_register_offset = 0x34;
-			mem2memdma_register = 0;
-			break;
 		case BRCM7435:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x80;
-			chr_luma_register_offset = 0x34;
-			mem2memdma_register = 0;
-			break;
-		case BRCM7552:
-			registeroffset = 0x10600000;
-			chr_luma_stride = 0x40;
 			chr_luma_register_offset = 0x34;
 			mem2memdma_register = 0;
 			break;
