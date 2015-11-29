@@ -83,7 +83,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, PALLAS, VULCAN, XILLEON, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM7241, BRCM7356, BRCM7424, BRCM7425, BRCM7435, BRCM7552} stb_type = UNKNOWN;
+static enum {UNKNOWN, PALLAS, VULCAN, XILLEON, BRCM7366ARM, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM7241, BRCM7346, BRCM7356, BRCM7424, BRCM7425, BRCM7435, BRCM7552} stb_type = UNKNOWN;
 
 static int chr_luma_stride = 0x40;
 static int chr_luma_register_offset = 0;
@@ -206,6 +206,15 @@ int main(int argc, char **argv)
 				{
 					stb_type = BRCM7425;
 					break;
+				}
+				else if (strstr(buf,"7366"))
+				{
+					stb_type = BRCM7366ARM;
+					break;
+				}
+				else if (strstr(buf,"7376"))
+				{
+					stb_type = BRCM7366ARM;
 				}
 				else if (strstr(buf,"7435"))
 				{
@@ -767,6 +776,22 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 	int stride = 0;
 	FILE *fp;
 	char buf[256];
+
+	if (stb_type == BRCM7366ARM)
+	{
+		int fd_video = open("/dev/dvb/adapter0/video0", O_RDONLY);
+		if (fd_video < 0)
+		{
+			fprintf(stderr, "could not open /dev/dvb/adapter0/video0");
+			return;
+		}
+
+		ssize_t r = read(fd_video, video, 1920 * 1080 * 3);
+		close(fd_video);
+		*xres = 1920;
+		*yres = 1080;
+		return;
+	}
 
 	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
 	{
