@@ -83,7 +83,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM7366ARM, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM7241, BRCM7346, BRCM7356, BRCM7424, BRCM7425, BRCM7435, BRCM7552} stb_type = UNKNOWN;
+static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM7366ARM, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM73625, BRCM7241, BRCM7346, BRCM7356, BRCM73565, BRCM7424, BRCM7425, BRCM7435, BRCM7552} stb_type = UNKNOWN;
 
 
 static int chr_luma_stride = 0x40;
@@ -183,6 +183,11 @@ int main(int argc, char **argv)
 					stb_type = BRCM7358;
 					break;
 				}
+				else if (strstr(buf,"73625"))
+				{
+					stb_type = BRCM73625;
+					break;
+				}
 				else if (strstr(buf,"7362"))
 				{
 					stb_type = BRCM7362;
@@ -191,6 +196,11 @@ int main(int argc, char **argv)
 				else if (strstr(buf,"7241"))
 				{
 					stb_type = BRCM7241;
+					break;
+				}
+				else if (strstr(buf,"73565"))
+				{
+					stb_type = BRCM73565;
 					break;
 				}
 				else if (strstr(buf,"7356"))
@@ -321,6 +331,12 @@ int main(int argc, char **argv)
 			chr_luma_register_offset = 0x34;
 			mem2memdma_register = 0;
 			break;
+		case BRCM73625:
+			registeroffset = 0x10600000;
+			chr_luma_stride = 0x40;
+			chr_luma_register_offset = 0x3c;
+			mem2memdma_register = 0;
+			break;
 		case BRCM7241:
 		case BRCM7346:
 		case BRCM7356:
@@ -330,6 +346,12 @@ int main(int argc, char **argv)
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x80;
 			chr_luma_register_offset = 0x34;
+			mem2memdma_register = 0;
+			break;
+		case BRCM73565:
+			registeroffset = 0x10600000;
+			chr_luma_stride = 0x80;
+			chr_luma_register_offset = 0x3c;
 			mem2memdma_register = 0;
 			break;
 		default:
@@ -808,11 +830,22 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		int adr, adr2, ofs, ofs2, offset, pageoffset;
 		int xtmp,xsub,ytmp,t2,dat1;
 
-		ofs = data[chr_luma_register_offset + 8] << 4; /* luma lines */
-		ofs2 = data[chr_luma_register_offset + 12] << 4; /* chroma lines */
-		adr2 = data[chr_luma_register_offset + 3] << 24 | data[chr_luma_register_offset + 2] << 16 | data[chr_luma_register_offset + 1] << 8;
-		stride = data[0x15] << 8 | data[0x14];
-		adr = data[0x1f] << 24 | data[0x1e] << 16 | data[0x1d] << 8; /* start of videomem */
+		if (stb_type == BRCM73565 || stb_type == BRCM73625)
+		{
+			ofs = data[chr_luma_register_offset + 24] << 4; /* luma lines */
+			ofs2 = data[chr_luma_register_offset + 28] << 4; /* chroma lines */
+			adr2 = data[chr_luma_register_offset + 3] << 24 | data[chr_luma_register_offset + 2] << 16 | data[chr_luma_register_offset + 1] << 8;
+			stride = data[0x19] << 8 | data[0x18];
+			adr = data[0x37] << 24 | data[0x36] << 16 | data[0x35] << 8; /* start of videomem */
+		}
+		else
+		{
+			ofs = data[chr_luma_register_offset + 8] << 4; /* luma lines */
+			ofs2 = data[chr_luma_register_offset + 12] << 4; /* chroma lines */
+			adr2 = data[chr_luma_register_offset + 3] << 24 | data[chr_luma_register_offset + 2] << 16 | data[chr_luma_register_offset + 1] << 8;
+			stride = data[0x15] << 8 | data[0x14];
+			adr = data[0x1f] << 24 | data[0x1e] << 16 | data[0x1d] << 8; /* start of videomem */
+		}
 		offset = adr2 - adr;
 		pageoffset = adr & 0xfff;
 		adr -= pageoffset;
