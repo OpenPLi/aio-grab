@@ -803,7 +803,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 	FILE *fp;
 	char buf[256];
 
-	if (stb_type == BRCM7366ARM || BRCM7439 || BRCM7445)
+	if ((stb_type == BRCM7366ARM) || (stb_type == BRCM7439) || (stb_type == BRCM7445))
 	{
 		int fd_video = open("/dev/dvb/adapter0/video0", O_RDONLY);
 		if (fd_video < 0)
