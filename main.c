@@ -239,6 +239,10 @@ int main(int argc, char **argv)
 				{
 					stb_type = BRCM_ARM;
 				}
+                                else if (strstr(buf,"7252s"))
+                                {
+                                        stb_type = BRCM_ARM;
+                                }
 				else if (strstr(buf,"7251"))
 				{
 					stb_type = BRCM7439;
