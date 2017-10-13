@@ -83,7 +83,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM_ARM, BRCM7439, BRCM7445, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM73625, BRCM7241, BRCM7346, BRCM7356, BRCM73565, BRCM7424, BRCM7425, BRCM7435, BRCM7552, BRCM7584} stb_type = UNKNOWN;
+static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM_ARM, BRCM7439, BRCM7445, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM73625, BRCM7241, BRCM7346, BRCM7356, BRCM73565, BRCM7424, BRCM7425, BRCM7435, BRCM7552, BRCM75845, BRCM7584} stb_type = UNKNOWN;
 
 
 static int chr_luma_stride = 0x40;
@@ -261,6 +261,11 @@ int main(int argc, char **argv)
 					stb_type = BRCM7552;
 					break;
 				}
+				else if (strstr(buf,"75845"))
+				{
+					stb_type = BRCM75845;
+					break;
+				}
 				else if (strstr(buf,"7584"))
 				{
 					stb_type = BRCM7584;
@@ -357,6 +362,7 @@ int main(int argc, char **argv)
 			mem2memdma_register = 0;
 			break;
 		case BRCM73625:
+		case BRCM75845:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x40;
 			chr_luma_register_offset = 0x3c;
@@ -855,7 +861,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 		int adr, adr2, ofs, ofs2, offset, pageoffset;
 		int xtmp,xsub,ytmp,t2,dat1;
 
-		if (stb_type == BRCM73565 || stb_type == BRCM73625)
+		if (stb_type == BRCM73565 || stb_type == BRCM73625 || stb_type == BRCM75845)
 		{
 			ofs = data[chr_luma_register_offset + 24] << 4; /* luma lines */
 			ofs2 = data[chr_luma_register_offset + 28] << 4; /* chroma lines */
