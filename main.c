@@ -83,7 +83,7 @@ void fast_resize(const unsigned char *source, unsigned char *dest, int xsource, 
 void (*resize)(const unsigned char *source, unsigned char *dest, int xsource, int ysource, int xdest, int ydest, int colors);
 void combine(unsigned char *output, const unsigned char *video, const unsigned char *osd, int vleft, int vtop, int vwidth, int vheight, int xres, int yres);
 
-static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM_ARM, BRCM7439, BRCM7445, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM73625, BRCM7241, BRCM7346, BRCM7356, BRCM73565, BRCM7424, BRCM7425, BRCM7435, BRCM7552, BRCM75845, BRCM7584} stb_type = UNKNOWN;
+static enum {UNKNOWN, PALLAS, VULCAN, WETEKPLAY, XILLEON, BRCM_ARM, BRCM7439, BRCM7445, BRCM7400, BRCM7401, BRCM7405, BRCM7325, BRCM7335, BRCM7358, BRCM7362, BRCM73625, BRCM7241, BRCM7346, BRCM7356, BRCM73565, BRCM7424, BRCM7425, BRCM7435, BRCM7552, BRCM75845, BRCM7584, BRCM7581, BRCM7583} stb_type = UNKNOWN;
 
 
 static int chr_luma_stride = 0x40;
@@ -275,6 +275,16 @@ int main(int argc, char **argv)
 					stb_type = BRCM7584;
 					break;
 				}
+				else if (strstr(buf,"7581"))
+				{
+					stb_type = BRCM7581;
+					break;
+				}
+				else if (strstr(buf,"7583"))
+				{
+					stb_type = BRCM7583;
+					break;
+				}
 				else if (strstr(buf,"Meson-6"))
 				{
 					stb_type = WETEKPLAY;
@@ -365,6 +375,7 @@ int main(int argc, char **argv)
 		case BRCM7552:
 		case BRCM7362:
 		case BRCM7584:
+		case BRCM7581:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x40;
 			chr_luma_register_offset = 0x34;
@@ -383,6 +394,7 @@ int main(int argc, char **argv)
 		case BRCM7424:
 		case BRCM7425:
 		case BRCM7435:
+		case BRCM7583:
 			registeroffset = 0x10600000;
 			chr_luma_stride = 0x80;
 			chr_luma_register_offset = 0x34;
