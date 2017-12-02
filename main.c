@@ -298,9 +298,14 @@ int main(int argc, char **argv)
 					stb_type = BRCM7405;
 					break;
 				}
-				else if (strcasestr(buf,"DM7080"))
+				else if (strcasestr(buf,"DM7080") || strcasestr(buf,"DM820"))
 				{
 					stb_type = BRCM7435;
+					break;
+				}
+				else if (strcasestr(buf,"DM520") || strcasestr(buf,"DM525"))
+				{
+					stb_type = BRCM73625;
 					break;
 				}
 				else if (strcasestr(buf,"DM8000"))
@@ -311,6 +316,11 @@ int main(int argc, char **argv)
 				else if (strcasestr(buf,"DM800"))
 				{
 					stb_type = BRCM7401;
+					break;
+				}
+				else if (strcasestr(buf,"DM900")) || (strcasestr(buf,"DM920"))
+				{
+					stb_type = BRCM7439;
 					break;
 				}
 			}
