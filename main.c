@@ -828,7 +828,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 	FILE *fp;
 	char buf[256];
 
-	if ((stb_type == BRCM_ARM) || (stb_type == HISIL_ARM)
+	if ((stb_type == BRCM_ARM) || (stb_type == HISIL_ARM))
 	{
 		int fd_video = open("/dev/dvb/adapter0/video0", O_RDONLY);
 		if (fd_video < 0)
