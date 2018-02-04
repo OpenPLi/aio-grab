@@ -337,11 +337,6 @@ int main(int argc, char **argv)
 			mem2memdma_register = 0;
 			break;
 		case BRCM7405:
-			registeroffset = 0x10100000;
-			chr_luma_stride = 0x80;
-			chr_luma_register_offset = 0x20;
-			mem2memdma_register = 0;
-			break;
 		case BRCM7325:
 			registeroffset = 0x10100000;
 			chr_luma_stride = 0x80;
