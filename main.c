@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 				}
 				else if (strstr(buf,"7251"))
 				{
-                                        stb_type = BRCM_ARM;
+					stb_type = BRCM_ARM;
 					break;
 				}
 				else if (strstr(buf,"7435"))
@@ -1115,7 +1115,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 					}
 					else if (overflow < xpart)
 					{
-                                                memcpy(luma + destx + extraoffset, frame_l, overflow);
+						memcpy(luma + destx + extraoffset, frame_l, overflow);
 					}
 					frame_l += xpart;
 				}
@@ -1171,7 +1171,7 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 					}
 					else if (overflow < xpart)
 					{
-                                                memcpy(chroma + destx + extraoffset, frame_c, overflow);
+						memcpy(chroma + destx + extraoffset, frame_c, overflow);
 					}
 					frame_c += xpart;
 				}
