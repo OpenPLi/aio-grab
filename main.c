@@ -91,6 +91,7 @@ static int chr_luma_register_offset = 0;
 static unsigned int registeroffset = 0;
 static unsigned int mem2memdma_register = 0;
 static int quiet = 0;
+static int video_dev = 0;
 
 // main program
 
@@ -415,7 +416,7 @@ int main(int argc, char **argv)
 	}
 
 	// process command line
-	while ((c = getopt (argc, argv, "dhj:lbnopqr:sv")) != -1)
+	while ((c = getopt (argc, argv, "dhj:lbnopqr:svi:")) != -1)
 	{
 		switch (c)
 		{
@@ -427,6 +428,7 @@ int main(int argc, char **argv)
 					"-o only grab osd (framebuffer) when using this with png or bmp\n"
 					"   fileformat you will get a 32bit pic with alphachannel\n"
 					"-v only grab video\n"
+					"-i (video device) to grab video (default 0)\n"
 					"-d always use osd resolution (good for skinshots)\n"
 					"-n dont correct 16:9 aspect ratio\n"
 					"-r (size) resize to a fixed width, maximum: 1920\n"
@@ -447,6 +449,9 @@ int main(int argc, char **argv)
 			case 'v': // Video only
 				video_only=1;
 				osd_only=0;
+				break;
+			case 'i': // Video device
+				video_dev=atoi(optarg);
 				break;
 			case 'd': // always use OSD resolution
 				use_osd_res=1;
@@ -853,10 +858,11 @@ void getvideo(unsigned char *video, int *xres, int *yres)
 
 	if ((stb_type == BRCM_ARM) || (stb_type == HISIL_ARM))
 	{
-		int fd_video = open("/dev/dvb/adapter0/video0", O_RDONLY);
+		sprintf(buf, "/dev/dvb/adapter0/video%d", video_dev);
+		int fd_video = open(buf, O_RDONLY);
 		if (fd_video < 0)
 		{
-			fprintf(stderr, "could not open /dev/dvb/adapter0/video0");
+			fprintf(stderr, "could not open %s\n", buf);
 			return;
 		}
 
