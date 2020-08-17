@@ -289,6 +289,11 @@ int main(int argc, char **argv)
 					stb_type = HISIL_ARM;
 					break;
 				}
+				else if (strstr(buf,"hi3716"))
+				{
+					stb_type = HISIL_ARM;
+					break;
+				}
 				else if (strstr(buf,"Meson-6"))
 				{
 					stb_type = WETEKPLAY;
