@@ -284,6 +284,11 @@ int main(int argc, char **argv)
 					stb_type = BRCM7583;
 					break;
 				}
+				else if (strstr(buf,"3798"))
+				{
+					stb_type = HISIL_ARM;
+					break;
+				}
 				else if (strstr(buf,"hi3798"))
 				{
 					stb_type = HISIL_ARM;
